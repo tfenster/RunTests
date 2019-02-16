@@ -11,12 +11,7 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/RunTests/bin/Debug/net472/RunTests.exe",
-            "args": [
-                "usernamepassword", 
-                "--serviceurl", "http://nav-mfa.westeurope.cloudapp.azure.com:8080/azure/cs",
-                "--username", "INFOMA\\TOBIAS.FENSTER",
-                "--password", "Passw0rd*123"
-            ],
+            "args": [],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",
