@@ -2,3 +2,4 @@ RunTests/packages
 RunTests/bin
 RunTests/obj
 RunTests/.vs
+connectionsettings.json

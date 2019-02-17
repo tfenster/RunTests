@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace RunTests
 {
@@ -43,7 +44,7 @@ namespace RunTests
                 throw new FileNotFoundException("Cannot locate file with Connection Information", settings.ServiceConnectionFile);
             }
             var authenticationSettings = JsonConvert.DeserializeObject<AuthenticationSetting>(System.IO.File.ReadAllText(settings.ServiceConnectionFile));
-            return RunNsysTests(authenticationSettings, settings);
+            return NewsystemTests.RunTests(authenticationSettings, settings);
         }
 
         private static int RunTestsAadAuth(AadAuthTestSettings settings)
@@ -59,7 +60,7 @@ namespace RunTests
                 ClientId = settings.ClientId,
                 ClientSecret = settings.ClientSecret
             };
-            return RunNsysTests(authenticationSetting, settings);
+            return NewsystemTests.RunTests(authenticationSetting, settings);
         }
 
         private static int RunTestsNavUserPasswordAuth(NavUserPasswordAuthTestSettings settings)
@@ -71,7 +72,7 @@ namespace RunTests
                 Username = settings.Username,
                 Password = settings.Password
             };
-            return RunNsysTests(authenticationSetting, settings);
+            return NewsystemTests.RunTests(authenticationSetting, settings);
         }
 
         private static int RunTestsWindowsAuth(WindowsAuthTestSettings settings)
@@ -81,54 +82,9 @@ namespace RunTests
                 AuthenticationScheme = AuthenticationScheme.Windows,
                 ServiceUrl = settings.ServiceUrl
             };
-            return RunNsysTests(authenticationSetting, settings);
+            return NewsystemTests.RunTests(authenticationSetting, settings);
         }
-
-        static int RunNsysTests(AuthenticationSetting authenticationSetting, TestSettingsBase settings)
-        { 
-            context = new UserContext(authenticationSetting);
-            var sessionParameters = new ClientSessionParameters
-            {
-                CultureId = "en-US",
-                UICultureId = "en-US"
-            };
-            Console.WriteLine("Open session");
-            context.OpenSession(sessionParameters);
-
-            Console.WriteLine("Warmup");
-            CallMethodWithStopwatch(OpenRoleCenterAndCustomerList, "open role center and customer list", context);
-
-            return 0;
-        }
-
-        private static void CallMethodWithStopwatch(Action<UserContext> action, string message, UserContext userContext) {
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-            action(context);
-            stopWatch.Stop();
-            TimeSpan ts = stopWatch.Elapsed;
-            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-                ts.Hours, ts.Minutes, ts.Seconds,
-                ts.Milliseconds / 10);
-            Console.WriteLine("Runtime for " + message + ": " + elapsedTime);
-        }
-
-        private static void OpenRoleCenterAndCustomerList(UserContext userContext)
-        {
-            var rc = context.OpenForm("5162300");
-            context.EnsurePage(5162300, rc);
-
-            var custList = context.OpenForm("22");
-            context.EnsurePage(22, custList);
-
-            if (custList.State == ClientLogicalFormState.Open)
-            {
-                context.InvokeInteraction(new CloseFormInteraction(custList));
-            }
-        }
-
-
-
+        
         static int RunTests(AuthenticationSetting authenticationSetting, TestSettingsBase settings)
         { 
             context = new UserContext(authenticationSetting);
