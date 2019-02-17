@@ -12,6 +12,8 @@ namespace RunTests {
         const int RoleCenterId = 5162300;
         const int CustomerListPageId = 22;
         const int BerichtsdefinitionenPageId = 5010603;
+        
+        const int ExplDebitorenpostenPageId = 5010440;
 
         public static int RunTests(AuthenticationSetting authenticationSetting, TestSettingsBase settings)
         { 
@@ -29,7 +31,10 @@ namespace RunTests {
             
             Console.WriteLine("Run");
             CallMethodWithStopwatch(OpenRoleCenterAndCustomerList, "open role center and customer list");
-            CallMethodWithStopwatch(CalcHHPlan, "calc HHPlan");
+            CallMethodWithStopwatch(UseExplCustLedgerEntries, "use explorer cust ledger entries");
+            //CallMethodWithStopwatch(CalcHHPlan, "calc HHPlan");
+
+            Console.WriteLine("Done");
 
             context.CloseSession();
             return 0;
@@ -56,6 +61,23 @@ namespace RunTests {
             context.EnsurePage(CustomerListPageId, custList);
 
             ClosePage(custList);
+        }
+
+        private static void UseExplCustLedgerEntries(UserContext userContext)
+        {
+            var explDebPos = context.OpenForm("" + ExplDebitorenpostenPageId);
+            context.EnsurePage(ExplDebitorenpostenPageId, explDebPos);
+
+            //explDebPos.Control("Sofortsuche aktiv").SaveValue(true);
+            explDebPos.Control("Suchbegriff Debitor").SaveValue("*AN");
+            explDebPos.Control("Buchungsdatum").SaveValue("010114..");
+            explDebPos.Action("Suchen").Invoke();
+
+            var column = explDebPos.Repeater().Columns.Where(col => col.Caption == "Restbetrag").First();
+            column.Action("Absteigend").Invoke();
+            column.Action("Aufsteigend").Invoke();
+
+            ClosePage(explDebPos);
         }
 
         private static void CalcHHPlan(UserContext userContext)
