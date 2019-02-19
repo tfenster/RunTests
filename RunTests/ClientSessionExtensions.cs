@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace RunTests
 {
@@ -237,6 +238,8 @@ namespace RunTests
             }
 
             var jsonClient = new JsonHttpClient(addressUri, credentials, authenticationSetting.AuthenticationScheme);
+            var httpClient = jsonClient.GetType().GetField("httpClient", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(jsonClient) as HttpClient;
+            httpClient.Timeout = TimeSpan.FromMinutes(120);
             return new ClientSession(jsonClient, new NonDispatcher(), new TimerFactory<TaskTimer>());
         }
 

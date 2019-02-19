@@ -32,7 +32,8 @@ namespace RunTests {
             Console.WriteLine("Run");
             CallMethodWithStopwatch(OpenRoleCenterAndCustomerList, "open role center and customer list");
             CallMethodWithStopwatch(UseExplCustLedgerEntries, "use explorer cust ledger entries");
-            //CallMethodWithStopwatch(CalcHHPlan, "calc HHPlan");
+            CallMethodWithStopwatch(CalcHHPlanKurz, "calc HHPlan kurz");
+            CallMethodWithStopwatch(CalcHHPlanLang, "calc HHPlan lang");
 
             Console.WriteLine("Done");
 
@@ -43,6 +44,7 @@ namespace RunTests {
         private static void CallMethodWithStopwatch(Action<UserContext> action, string message) {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
+            Console.WriteLine("Starting " + message + " at " + DateTime.Now.ToShortTimeString());
             action(context);
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
@@ -80,27 +82,24 @@ namespace RunTests {
             ClosePage(explDebPos);
         }
 
-        private static void CalcHHPlan(UserContext userContext)
+        private static void CalcHHPlanKurz(UserContext userContext)
+        {
+            CalcHHPlan(userContext, "HHKURZ2011");
+        }
+
+        private static void CalcHHPlanLang(UserContext userContext)
+        {
+            CalcHHPlan(userContext, "HHPLAN2015");
+        }
+
+        private static void CalcHHPlan(UserContext userContext, string plan)
         {
             var berichtsdefinitionenForm = context.OpenForm("" + BerichtsdefinitionenPageId);
             context.EnsurePage(BerichtsdefinitionenPageId, berichtsdefinitionenForm);
-            ExecuteQuickFilter(berichtsdefinitionenForm, "Code", "HHKURZ2011"); // HHPLAN2015
+            ExecuteQuickFilter(berichtsdefinitionenForm, "Code", plan);
             var berichtsdefinitionForm = berichtsdefinitionenForm.Action("Ansicht").InvokeCatchForm();
-            ClientLogicalForm confirmDialog = userContext.CatchDialog(berichtsdefinitionForm.Action("Daten berechnen").Invoke);
-            //var confirmDialog = berichtsdefinitionForm.Action("Daten berechnen").InvokeCatchDialog();
-            
-            Task.Run(() =>
-            {
-                while (confirmDialog.Session.IsReadyOrBusy())
-                {
-                    Console.WriteLine("send keepalive");
-                    confirmDialog.Session.KeepAliveAsync();
-                    Thread.Sleep(60 * 1000);
-                }
-            });
-            //var progressDialog = confirmDialog.Action("Ja").InvokeCatchDialog();
-            
-            confirmDialog.Session.AwaitReady(() => { }, session => session.State == ClientSessionState.Ready, false, -1);
+            var confirmDialog = berichtsdefinitionForm.Action("Daten berechnen").InvokeCatchDialog();
+            var progressDialog = confirmDialog.Action("Ja").InvokeCatchDialog();
             ClosePage(berichtsdefinitionForm);
             ClosePage(berichtsdefinitionenForm);
         }
