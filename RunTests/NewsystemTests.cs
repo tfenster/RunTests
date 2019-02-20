@@ -28,6 +28,7 @@ namespace RunTests {
 
             Console.WriteLine("Warmup");
             CallMethodWithStopwatch(OpenRoleCenterAndCustomerList, "open role center and customer list");
+            CallMethodWithStopwatch(UseExplCustLedgerEntries, "use explorer cust ledger entries");
             
             Console.WriteLine("Run");
             CallMethodWithStopwatch(OpenRoleCenterAndCustomerList, "open role center and customer list");
@@ -99,7 +100,9 @@ namespace RunTests {
             ExecuteQuickFilter(berichtsdefinitionenForm, "Code", plan);
             var berichtsdefinitionForm = berichtsdefinitionenForm.Action("Ansicht").InvokeCatchForm();
             var confirmDialog = berichtsdefinitionForm.Action("Daten berechnen").InvokeCatchDialog();
-            var progressDialog = confirmDialog.Action("Ja").InvokeCatchDialog();
+            if (confirmDialog != null)
+                confirmDialog.Action("Ja").Invoke();
+            context.ClientSession.AwaitReady(() => { }, session => session.State == ClientSessionState.Ready, false, -1);
             ClosePage(berichtsdefinitionForm);
             ClosePage(berichtsdefinitionenForm);
         }
