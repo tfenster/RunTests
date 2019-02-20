@@ -28,6 +28,8 @@ namespace RunTests
 
         static int Main(string[] args)
         {
+            // Set Keep-Alive on Tcp Level to 2 minutes to avoid Azure closing our connection
+            ServicePointManager.SetTcpKeepAlive(true, 2 * 60 * 1000, 2 * 60 * 1000);
             return Parser.Default.ParseArguments<WindowsAuthTestSettings, NavUserPasswordAuthTestSettings, AadAuthTestSettings, TestSettingsConnectionFile>(args)
                 .MapResult(
                 (WindowsAuthTestSettings settings) => RunTestsWindowsAuth(settings),
