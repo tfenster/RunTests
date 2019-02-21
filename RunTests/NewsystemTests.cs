@@ -83,6 +83,23 @@ namespace RunTests {
             ClosePage(explDebPos);
         }
 
+        private static void DummySleeper(AuthenticationSetting authenticationSettings) {
+            context = new UserContext(authenticationSettings);
+            var sessionParameters = new ClientSessionParameters
+            {
+                CultureId = "en-US",
+                UICultureId = "en-US"
+            };
+            Console.WriteLine("Open session");
+            context.OpenSession(sessionParameters);
+
+            var explDebPos = context.OpenForm("50003");
+            context.EnsurePage(50003, explDebPos);
+            explDebPos.Action("GoAction").Invoke();
+
+            context.CloseSession();
+        }
+
         private static void CalcHHPlanKurz(UserContext userContext)
         {
             CalcHHPlan(userContext, "HHKURZ2011");
