@@ -12,7 +12,7 @@ using System.Net;
 
 namespace RunTests
 {
-    class Program
+    class Program 
     {
         static UserContext context = null;
 
