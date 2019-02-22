@@ -16,16 +16,6 @@ namespace RunTests
     {
         static UserContext context = null;
 
-
-        //static string GetClientServiceEndpoint(string azuretenantId)
-        //{
-        //    var webClient = new System.Net.WebClient();
-        //    var s = webClient.DownloadString($"https://businesscentral.dynamics.com/{azuretenantId}/deployment/url");
-        //    var deploymentStatus = JsonConvert.DeserializeObject<DeploymentStatus>(s);
-        //    var parts = deploymentStatus.data.Split('?');
-        //    return parts[0] + (parts[0].EndsWith("/") ? "" : "/") + "cs?" + parts[1];
-        //}
-
         static int Main(string[] args)
         {
             // Set Keep-Alive on Tcp Level to 2 minutes to avoid Azure closing our connection
